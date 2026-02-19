@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <h2 class="mb-3">Edit: {{ holding.label }}</h2>
+        <form method="POST">
+            <div class="mb-3">
+                <label class="form-label">Category</label>
+                <input type="text" class="form-control" value="{{ holding.category | upper }}" disabled>
+            </div>
+
+            <div class="mb-3">
+                <label for="label" class="form-label">Name / Label</label>
+                <input type="text" class="form-control" id="label" name="label" value="{{ holding.label }}" required>
+            </div>
+
+            {% if holding.category == 'btc' %}
+            <div class="mb-3">
+                <label for="btc_amount" class="form-label">BTC Amount</label>
+                <input type="number" class="form-control" name="btc_amount" step="0.00000001" value="{{ holding.btc_amount }}">
+            </div>
+
+            {% elif holding.category == 'avanza' %}
+            <div class="mb-3">
+                <label for="isin" class="form-label">ISIN</label>
+                <input type="text" class="form-control" name="isin" value="{{ holding.isin or '' }}">
+            </div>
+            {% if holding.ticker %}
+            <div class="mb-3">
+                <label class="form-label">Auto-tracked</label>
+                <input type="text" class="form-control" value="Ticker: {{ holding.ticker }}{% if holding.shares %} | Units: {{ '%.4f' % holding.shares }}{% endif %}" disabled>
+                <div class="form-text">Price updates automatically via Yahoo Finance.</div>
+            </div>
+            {% endif %}
+
+            <hr class="my-3">
+            <p class="text-muted small mb-2">Update <strong>one</strong> of the below, or leave both empty to keep current values:</p>
+
+            <div class="mb-3">
+                <label for="shares" class="form-label">Number of Shares / Units</label>
+                <input type="number" class="form-control" name="shares" step="0.0001" value="{{ holding.shares if holding.shares else '' }}" placeholder="For stocks/certificates">
+            </div>
+            <div class="mb-3">
+                <label for="current_value_sek" class="form-label">OR Current Value (SEK)</label>
+                <input type="number" class="form-control" name="current_value_sek" step="1" placeholder="For funds — recalculates units from value">
+            </div>
+
+            {% elif holding.category == 'bondora' %}
+            <div class="mb-3">
+                <label for="principal_eur" class="form-label">Principal (EUR)</label>
+                <input type="number" class="form-control" name="principal_eur" step="0.01" value="{{ holding.principal_eur }}">
+            </div>
+            <div class="mb-3">
+                <label for="interest_rate" class="form-label">Annual Interest Rate (%)</label>
+                <input type="number" class="form-control" name="interest_rate" step="0.01" value="{{ (holding.interest_rate * 100) | round(2) }}">
+            </div>
+            <div class="mb-3">
+                <label for="start_date" class="form-label">Interest Start Date</label>
+                <input type="date" class="form-control" name="start_date" value="{{ holding.start_date.isoformat() }}">
+            </div>
+
+            {% elif holding.category == 'csn' %}
+            <div class="mb-3">
+                <label for="balance_sek" class="form-label">Outstanding Balance (SEK)</label>
+                <input type="number" class="form-control" name="balance_sek" step="1" value="{{ holding.balance_sek | int }}">
+            </div>
+            <div class="mb-3">
+                <label for="csn_interest_rate" class="form-label">Interest Rate (%)</label>
+                <input type="number" class="form-control" name="csn_interest_rate" step="0.01" value="{{ (holding.csn_interest_rate * 100) | round(2) }}">
+            </div>
+            {% endif %}
+
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <a href="/" class="btn btn-outline-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

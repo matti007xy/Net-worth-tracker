@@ -1,0 +1,35 @@
+body {
+    background-color: #f8f9fa;
+}
+
+.display-4 {
+    font-weight: 700;
+}
+
+.card {
+    border: none;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-radius: 0.5rem;
+}
+
+.card-title {
+    font-weight: 600;
+    color: #333;
+}
+
+.table th {
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    color: #666;
+    border-top: none;
+}
+
+.badge {
+    font-weight: 500;
+    font-size: 0.75rem;
+}
+
+.navbar-brand {
+    font-weight: 700;
+}

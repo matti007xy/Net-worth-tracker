@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12 text-center">
+        <h1 class="display-4 mb-1 {% if total >= 0 %}text-success{% else %}text-danger{% endif %}">
+            {{ total | sek }}
+        </h1>
+        <p class="text-muted">Total Net Worth</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <!-- Pie chart -->
+    <div class="col-md-5">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Breakdown</h5>
+                {% if category_totals %}
+                    <canvas id="breakdownChart"></canvas>
+                {% else %}
+                    <p class="text-muted">No holdings yet. <a href="/add">Add one</a>.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Holdings table -->
+    <div class="col-md-7">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Holdings</h5>
+                {% if valuations %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th class="text-end">Value</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for holding, val in valuations %}
+                            <tr>
+                                <td>{{ holding.label }}</td>
+                                <td>
+                                    <span class="badge bg-{{ 'warning' if holding.category == 'btc' else 'primary' if holding.category == 'avanza' else 'info' if holding.category == 'bondora' else 'danger' }}">
+                                        {{ holding.category | upper }}
+                                    </span>
+                                </td>
+                                <td class="text-end {% if val is not none and val >= 0 %}text-success{% elif val is not none %}text-danger{% endif %}">
+                                    {{ val | sek }}
+                                </td>
+                                <td class="text-end">
+                                    <a href="/edit/{{ holding.id }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                    <form method="POST" action="/delete/{{ holding.id }}" class="d-inline"
+                                          onsubmit="return confirm('Delete {{ holding.label }}?')">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Del</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                    <p class="text-muted">No holdings yet. <a href="/add">Add your first holding</a>.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Snapshot button -->
+<div class="row mb-4">
+    <div class="col-12 text-center">
+        <form method="POST" action="/snapshot" class="d-inline">
+            <button type="submit" class="btn btn-outline-dark">Take Snapshot Now</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% if category_totals %}
+<script>
+const catData = {{ category_totals | tojson }};
+const labels = Object.keys(catData);
+const values = Object.values(catData).map(v => Math.abs(v));
+const colors = labels.map(l => {
+    if (l === 'Bitcoin') return '#f7931a';
+    if (l === 'Avanza') return '#0066cc';
+    if (l === 'Bondora') return '#17a2b8';
+    if (l === 'CSN Loans') return '#dc3545';
+    return '#6c757d';
+});
+
+new Chart(document.getElementById('breakdownChart'), {
+    type: 'doughnut',
+    data: {
+        labels: labels,
+        datasets: [{
+            data: values,
+            backgroundColor: colors,
+            borderWidth: 2
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    label: function(ctx) {
+                        const raw = catData[ctx.label];
+                        const sign = raw < 0 ? '-' : '';
+                        const formatted = Math.abs(raw).toLocaleString('sv-SE', {maximumFractionDigits: 0});
+                        return ctx.label + ': ' + sign + formatted + ' kr';
+                    }
+                }
+            }
+        }
+    }
+});
+</script>
+{% endif %}
+{% endblock %}

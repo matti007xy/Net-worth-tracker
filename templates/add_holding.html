@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <h2 class="mb-3">Add Holding</h2>
+        <form method="POST">
+            <div class="mb-3">
+                <label for="category" class="form-label">Category</label>
+                <select class="form-select" id="category" name="category" onchange="toggleFields()" required>
+                    <option value="btc">Bitcoin</option>
+                    <option value="avanza">Avanza (Stocks/Funds)</option>
+                    <option value="bondora">Bondora (P2P)</option>
+                    <option value="csn">CSN Student Loan</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="label" class="form-label">Name / Label</label>
+                <input type="text" class="form-control" id="label" name="label" placeholder="e.g. My Bitcoin, Ericsson B, CSN - Tim" required>
+            </div>
+
+            <!-- BTC fields -->
+            <div id="fields-btc" class="category-fields">
+                <div class="mb-3">
+                    <label for="btc_amount" class="form-label">BTC Amount</label>
+                    <input type="number" class="form-control" id="btc_amount" name="btc_amount" step="0.00000001" placeholder="e.g. 0.5">
+                </div>
+            </div>
+
+            <!-- Avanza fields -->
+            <div id="fields-avanza" class="category-fields" style="display:none">
+                <div class="mb-3">
+                    <label for="isin" class="form-label">ISIN</label>
+                    <input type="text" class="form-control" id="isin" name="isin" placeholder="e.g. SE0011527613">
+                    <div class="form-text">Find the ISIN on the fund/stock page in Avanza</div>
+                </div>
+
+                <hr class="my-3">
+                <p class="text-muted small mb-2">Fill in <strong>one</strong> of the two below:</p>
+
+                <div class="mb-3">
+                    <label for="shares" class="form-label">Number of Shares / Units</label>
+                    <input type="number" class="form-control" id="shares" name="shares" step="0.0001" placeholder="e.g. 8 (for stocks/certificates)">
+                    <div class="form-text">Use this for stocks and certificates where you know the number of shares</div>
+                </div>
+                <div class="mb-3">
+                    <label for="current_value_sek" class="form-label">OR Current Value (SEK)</label>
+                    <input type="number" class="form-control" id="current_value_sek" name="current_value_sek" step="1" placeholder="e.g. 17552 (for funds)">
+                    <div class="form-text">Use this for funds where you only see the total value in Avanza</div>
+                </div>
+            </div>
+
+            <!-- Bondora fields -->
+            <div id="fields-bondora" class="category-fields" style="display:none">
+                <div class="mb-3">
+                    <label for="principal_eur" class="form-label">Principal (EUR)</label>
+                    <input type="number" class="form-control" id="principal_eur" name="principal_eur" step="0.01" placeholder="e.g. 5000">
+                </div>
+                <div class="mb-3">
+                    <label for="interest_rate" class="form-label">Annual Interest Rate (%)</label>
+                    <input type="number" class="form-control" id="interest_rate" name="interest_rate" step="0.01" placeholder="e.g. 6.75">
+                </div>
+                <div class="mb-3">
+                    <label for="start_date" class="form-label">Interest Start Date</label>
+                    <input type="date" class="form-control" id="start_date" name="start_date">
+                </div>
+            </div>
+
+            <!-- CSN fields -->
+            <div id="fields-csn" class="category-fields" style="display:none">
+                <div class="mb-3">
+                    <label for="balance_sek" class="form-label">Outstanding Balance (SEK)</label>
+                    <input type="number" class="form-control" id="balance_sek" name="balance_sek" step="1" placeholder="e.g. 200000">
+                </div>
+                <div class="mb-3">
+                    <label for="csn_interest_rate" class="form-label">Interest Rate (%)</label>
+                    <input type="number" class="form-control" id="csn_interest_rate" name="csn_interest_rate" step="0.01" placeholder="e.g. 0.6">
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Add Holding</button>
+            <a href="/" class="btn btn-outline-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+
+<script>
+function toggleFields() {
+    document.querySelectorAll('.category-fields').forEach(el => el.style.display = 'none');
+    const cat = document.getElementById('category').value;
+    const target = document.getElementById('fields-' + cat);
+    if (target) target.style.display = 'block';
+}
+
+
+</script>
+{% endblock %}
